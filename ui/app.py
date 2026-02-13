@@ -1,11 +1,14 @@
 import streamlit as st
 
+st.set_page_config(page_title="News Brief Generator", page_icon="📰", layout="centered")
+
 from agents import run_scout, run_publisher, normalize_payload
 from utils import get_location_context
-from components import tile
+from components import inject_css, page_header, tile
 
-# Topic input
-st.title("Generate News Reports")
+inject_css()
+page_header()
+
 st.markdown("**What do you want to search about?**")
 topic = st.text_input("topic", "Semiconductor factory opening in Japan", label_visibility="collapsed")
 
@@ -17,15 +20,13 @@ with st.sidebar:
     st.header("Options")
     show_metadata = st.checkbox("Show metadata", value=False)
 
-if st.button("Generate Report"):
-    st.write("Running Scout...")
-    scout_data = run_scout(topic, city)
-
-    # Normalize image src before sending to publisher
+if st.button("Generate Report", use_container_width=True):
+    with st.spinner("Running Scout..."):
+        scout_data = run_scout(topic, city)
     scout_data = normalize_payload(scout_data)
 
-    st.write("Running Publisher...")
-    publisher_data = run_publisher(scout_data)
+    with st.spinner("Running Publisher..."):
+        publisher_data = run_publisher(scout_data)
 
     # Context snapshot tiles
     context = scout_data.get("context", {})
