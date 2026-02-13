@@ -6,7 +6,8 @@ from components import tile
 
 # Topic input
 st.title("Generate News Reports")
-topic = st.text_input("Topic", "Semiconductor factory opening in Japan")
+st.markdown("**What do you want to search about?**")
+topic = st.text_input("topic", "Semiconductor factory opening in Japan", label_visibility="collapsed")
 
 # Auto-fetch city using LLM
 city = get_location_context(topic)['capital']
