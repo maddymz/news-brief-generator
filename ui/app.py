@@ -74,8 +74,11 @@ topic = st.text_input("Topic", "Semiconductor factory opening in Japan")
 # Auto-fetch city using LLM
 city = get_location_context(topic)['capital']
 
-# Task 11: Improve Article Readability in the UI
-# Button triggers agents
+# Metadata toggle in sidebar
+with st.sidebar:
+    st.header("Options")
+    show_metadata = st.checkbox("Show metadata", value=False)
+
 if st.button("Generate Report"):
     st.write("Running Scout...")
     scout_data = run_scout(topic, city)
@@ -91,7 +94,7 @@ if st.button("Generate Report"):
     with st.expander("Read full article"):
         st.markdown(publisher_data.get("article", "No output"), unsafe_allow_html=True)
 
-    # Display related image above/below article
+    # Display related image
     try:
         image_url = scout_data["media"]["images"][0]["src"]["url"]
         if image_url:
@@ -99,14 +102,15 @@ if st.button("Generate Report"):
     except Exception:
         pass
 
-    # Keep payload visible but secondary
-    st.subheader("Payload")
-    st.json(publisher_data.get("payload"))
+    # Metadata section — hidden by default
+    if show_metadata:
+        st.divider()
+        st.subheader("Metadata")
 
-    # Show signal only if valid
-    signal = publisher_data.get("signal")
-    if isinstance(signal, dict) and "ERROR" not in signal:
-        st.subheader("Full Signal")
-        st.json(signal)
-    else:
-        st.write("Signal is invalid or contains errors.")
+        st.markdown("**Payload**")
+        st.json(publisher_data.get("payload"))
+
+        signal = publisher_data.get("signal")
+        if isinstance(signal, dict) and "ERROR" not in signal:
+            st.markdown("**Signal**")
+            st.json(signal)
