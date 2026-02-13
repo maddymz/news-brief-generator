@@ -89,6 +89,41 @@ if st.button("Generate Report"):
     st.write("Running Publisher...")
     publisher_data = run_publisher(scout_data)
 
+    # Context snapshot tiles
+    context = scout_data.get("context", {})
+    fx = context.get("financial_context", {})
+    weather_str = context.get("location", {}).get("weather", "N/A")
+    currency = fx.get("currency_code", "")
+    rate = fx.get("rate", "")
+    fx_str = f"1 {currency} = {rate} USD" if rate else "N/A"
+
+    def tile(icon, label, value):
+        return f"""
+        <div style="
+            background:#f8f9fb;
+            border:1px solid #e0e4ea;
+            border-radius:12px;
+            padding:16px 14px;
+            text-align:center;
+            min-height:90px;
+        ">
+            <div style="font-size:11px;color:#888;font-weight:600;
+                        text-transform:uppercase;letter-spacing:0.8px;
+                        margin-bottom:8px;">{icon} {label}</div>
+            <div style="font-size:14px;font-weight:600;color:#1a1a2e;
+                        word-wrap:break-word;line-height:1.5;">{value}</div>
+        </div>"""
+
+    st.write("")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(tile("📍", "Location", scout_data.get("location", "N/A")), unsafe_allow_html=True)
+    with col2:
+        st.markdown(tile("🌤", "Weather", weather_str), unsafe_allow_html=True)
+    with col3:
+        st.markdown(tile("💱", "Exchange Rate", fx_str), unsafe_allow_html=True)
+    st.write("")
+
     # Render Article in an expander to reduce scrolling
     st.subheader("Final Article")
     with st.expander("Read full article"):
