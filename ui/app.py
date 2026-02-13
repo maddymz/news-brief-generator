@@ -67,7 +67,7 @@ def normalize_payload(payload):
     return payload
 
 # Streamlit UI
-st.title("SYNAPSE - Context Aware Reports")
+st.title("Generate News Reports")
 
 # Topic input
 topic = st.text_input("Topic", "Semiconductor factory opening in Japan")
