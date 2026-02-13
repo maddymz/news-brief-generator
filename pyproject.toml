@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "news-brief-generator"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "fastmcp",
+    "streamlit",
+    "openai",
+    "requests",
+    "python-dotenv",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["protocol*"]
