@@ -1,0 +1,93 @@
+services:
+
+  # ── MCP Servers (layer 1) ─────────────────────────────────────────────────
+
+  world-data:
+    build: .
+    command: python mcp-servers/world-data/server.py
+    env_file: .env
+    restart: unless-stopped
+
+  finance-monitor:
+    build: .
+    command: python mcp-servers/finance-monitor/server.py
+    env_file: .env
+    restart: unless-stopped
+
+  media-engine:
+    build: .
+    command: python mcp-servers/media-engine/server.py
+    env_file: .env
+    restart: unless-stopped
+
+  # ── Agents (layer 2) ──────────────────────────────────────────────────────
+
+  contextualist:
+    build: .
+    command: python agents/contextualist_agent/main.py
+    volumes:
+      - post-office:/app/protocol
+    depends_on:
+      - world-data
+      - finance-monitor
+    env_file: .env
+    environment:
+      WORLD_DATA_URL: http://world-data:8001/mcp
+      FINANCE_URL: http://finance-monitor:8002/mcp
+    restart: unless-stopped
+
+  scout:
+    build: .
+    command: python agents/scout_agent/main.py
+    volumes:
+      - post-office:/app/protocol
+    depends_on:
+      - contextualist
+      - media-engine
+    env_file: .env
+    environment:
+      CONTEXTUALIST_URL: http://contextualist:8000/mcp
+      MEDIA_ENGINE_URL: http://media-engine:8003/mcp
+    restart: unless-stopped
+
+  publisher:
+    build: .
+    command: python agents/publisher_agent/main.py
+    volumes:
+      - post-office:/app/protocol
+    depends_on:
+      - scout
+    env_file: .env
+    restart: unless-stopped
+
+  # ── UI (layer 3) ──────────────────────────────────────────────────────────
+
+  ui:
+    build: .
+    command: streamlit run ui/app.py --server.port 8501 --server.address 0.0.0.0
+    volumes:
+      - post-office:/app/protocol
+    depends_on:
+      - scout
+      - publisher
+    env_file: .env
+    environment:
+      SCOUT_URL: http://scout:8004/mcp
+      PUBLISHER_URL: http://publisher:8005/mcp
+    restart: unless-stopped
+
+  # ── Nginx (public entry point) ────────────────────────────────────────────
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+    depends_on:
+      - ui
+    restart: unless-stopped
+
+volumes:
+  post-office:

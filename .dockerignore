@@ -3,4 +3,4 @@ __pycache__/
 *.egg-info/
 .env
 protocol/post_office.json
-nginx/.htpasswd
+.git/

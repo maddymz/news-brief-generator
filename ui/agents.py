@@ -1,8 +1,9 @@
 import asyncio
+import os
 from fastmcp import Client
 
-SCOUT_URL = "http://0.0.0.0:8004/mcp"
-PUBLISHER_URL = "http://0.0.0.0:8005/mcp"
+SCOUT_URL = os.getenv("SCOUT_URL", "http://0.0.0.0:8004/mcp")
+PUBLISHER_URL = os.getenv("PUBLISHER_URL", "http://0.0.0.0:8005/mcp")
 
 
 async def call_tool(url, tool, params):
