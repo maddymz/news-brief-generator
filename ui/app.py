@@ -1,76 +1,13 @@
-# Pre-provided imports
-from dotenv import load_dotenv
-from openai import OpenAI
-import json
-import os
-
-load_dotenv()  # Load environment variables
-
-# MCP agent URLs
-SCOUT_URL = "http://0.0.0.0:8004/mcp"
-PUBLISHER_URL = "http://0.0.0.0:8005/mcp"
-
-# Fetch OpenAI API key from environment
-api_key = os.getenv("OPENAI_API_KEY")
-
-# Async helper to call MCP tools
-async def call_tool(url, tool, params):
-    async with Client(url) as client:
-        res = await client.call_tool(tool, params)
-        return res.data
-
-# Pre-provided OpenAI client
-client = OpenAI(api_key=api_key)
-
-# Pre-provided function to fetch city/country context from topic
-def get_location_context(news_text: str) -> dict:
-    """
-    Extracts country and capital from a text string using an LLM.
-    """
-    prompt = f"""
-    Given the news text below, identify the primary country it is about.
-    Return only a JSON object with the keys 'country' and 'capital'.
-    If no country is mentioned, return US and its capital for both.
-
-    Text: "{news_text}"
-    """
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        response_format={"type": "json_object"}
-    )
-    return json.loads(response.choices[0].message.content)
-
-# Task 10: Build Streamlit Interface to Trigger Agents
 import streamlit as st
-import asyncio
-from fastmcp import Client
-# Call Scout agent
-def run_scout(topic, city):
-    return asyncio.run(call_tool(SCOUT_URL, "scout", {"topic": topic, "city": city}))
 
-# Call Publisher agent
-def run_publisher(payload):
-    return asyncio.run(call_tool(PUBLISHER_URL, "publish_brief", {"payload": payload}))
-
-# Normalize payload to ensure image src is a valid JSON object
-def normalize_payload(payload):
-    try:
-        img = payload["media"]["images"][0]
-        src = img.get("src")
-        if isinstance(src, str):
-            img["src"] = {"url": src, "type": "image"}
-        if src is None:
-            img["src"] = {"url": "", "type": "image"}
-    except Exception:
-        pass
-    return payload
-
-# Streamlit UI
-st.title("Generate News Reports")
+from agents import run_scout, run_publisher, normalize_payload
+from utils import get_location_context
+from components import tile
 
 # Topic input
+st.title("Generate News Reports")
 topic = st.text_input("Topic", "Semiconductor factory opening in Japan")
+
 # Auto-fetch city using LLM
 city = get_location_context(topic)['capital']
 
@@ -88,6 +25,24 @@ if st.button("Generate Report"):
 
     st.write("Running Publisher...")
     publisher_data = run_publisher(scout_data)
+
+    # Context snapshot tiles
+    context = scout_data.get("context", {})
+    fx = context.get("financial_context", {})
+    weather_str = context.get("location", {}).get("weather", "N/A")
+    currency = fx.get("currency_code", "")
+    rate = fx.get("rate", "")
+    fx_str = f"1 {currency} = {rate} USD" if rate else "N/A"
+
+    st.write("")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(tile("📍", "Location", scout_data.get("location", "N/A")), unsafe_allow_html=True)
+    with col2:
+        st.markdown(tile("🌤", "Weather", weather_str), unsafe_allow_html=True)
+    with col3:
+        st.markdown(tile("💱", "Exchange Rate", fx_str), unsafe_allow_html=True)
+    st.write("")
 
     # Render Article in an expander to reduce scrolling
     st.subheader("Final Article")
