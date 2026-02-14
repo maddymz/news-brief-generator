@@ -37,6 +37,10 @@ jobs:
           docker push ${{ env.IMAGE }}:${{ github.sha }}
 
       - name: Stage secrets and deploy
+        # APP_CREDENTIALS is JSON — inject via env: so the shell sees a bash
+        # variable ($APP_CREDS) rather than a literal with embedded double quotes.
+        env:
+          APP_CREDS: ${{ secrets.APP_CREDENTIALS }}
         # --stage applies secrets atomically with the deploy (no double restart)
         run: |
           flyctl secrets set \
@@ -45,7 +49,7 @@ jobs:
             OPENWEATHERMAP_API_KEY="${{ secrets.OPENWEATHERMAP_API_KEY }}" \
             EXCHANGE_RATE_API_KEY="${{ secrets.EXCHANGE_RATE_API_KEY }}" \
             PEXELS_API_KEY="${{ secrets.PEXELS_API_KEY }}" \
-            APP_CREDENTIALS="${{ secrets.APP_CREDENTIALS }}" \
+            APP_CREDENTIALS="$APP_CREDS" \
             --app ${{ env.FLY_APP }} \
             --stage
           flyctl deploy \
