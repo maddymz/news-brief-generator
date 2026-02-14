@@ -1,5 +1,6 @@
 import asyncio
 import json
+import os
 import time
 from fastmcp import FastMCP, Client
 from contextlib import AsyncExitStack
@@ -9,8 +10,8 @@ from protocol.post_office import send_message, read_messages, clear_messages
 mcp = FastMCP("Scout Agent")
 
 # MCP endpoints for downstream agents
-CONTEXTUALIST_URL = "http://0.0.0.0:8000/mcp"
-MEDIA_URL = "http://0.0.0.0:8003/mcp"
+CONTEXTUALIST_URL = os.getenv("CONTEXTUALIST_URL", "http://0.0.0.0:8000/mcp")
+MEDIA_URL = os.getenv("MEDIA_ENGINE_URL", "http://0.0.0.0:8003/mcp")
 
 
 def wait_for_response(task_id: str, timeout: int = 10):
