@@ -18,9 +18,6 @@ RUN pip install --no-cache-dir -e .
 COPY supervisord.conf /etc/supervisor/conf.d/news-brief.conf
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
-# nginx/.htpasswd is gitignored; injected at build time by CI (see .gitlab-ci.yml)
-COPY nginx/.htpasswd /etc/nginx/.htpasswd
-
 RUN mkdir -p /var/log/supervisor
 
 EXPOSE 80
