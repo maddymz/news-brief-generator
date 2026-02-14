@@ -2,11 +2,16 @@ import streamlit as st
 
 st.set_page_config(page_title="News Brief Generator", page_icon="📰", layout="centered")
 
+import os
+import json
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
+
 from agents import run_scout, run_publisher, normalize_payload
 from utils import get_location_context
 from components import inject_css, page_header, tile
-import os
-import json
 
 # ── Auth ─────────────────────────────────────────────────────────────────────
 # APP_CREDENTIALS env var (Fly secret) holds a JSON blob with hashed credentials.
