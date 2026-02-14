@@ -4,3 +4,4 @@ __pycache__/
 .env
 protocol/post_office.json
 nginx/.htpasswd
+docs/

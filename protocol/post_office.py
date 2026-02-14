@@ -1,9 +1,12 @@
 import json
+import os
 from pathlib import Path
 from datetime import datetime
 
-# Path to the JSON file where messages are stored
-POST_OFFICE_PATH = Path(__file__).resolve().parent / "post_office.json"
+# Path to the JSON file where messages are stored.
+# POST_OFFICE_DIR can be overridden via env var (used in Fly.io to avoid
+# shadowing source files with the mounted volume at /data/protocol).
+POST_OFFICE_PATH = Path(os.getenv("POST_OFFICE_DIR", str(Path(__file__).resolve().parent))) / "post_office.json"
 
 def _ensure_file():
     """
