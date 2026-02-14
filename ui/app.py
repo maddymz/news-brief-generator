@@ -18,19 +18,20 @@ from components import inject_css, page_header, tile
 # If absent (local dev without docker-compose), auth is skipped entirely.
 _creds_json = os.getenv("APP_CREDENTIALS")
 if _creds_json:
-    import streamlit_authenticator as stauth
+    import bcrypt
     _cfg = json.loads(_creds_json)
-    _auth = stauth.Authenticate(
-        _cfg["credentials"],
-        _cfg["cookie"]["name"],
-        _cfg["cookie"]["key"],
-        _cfg["cookie"]["expiry_days"],
-    )
-    _auth.login()
-    if st.session_state.get("authentication_status") is False:
-        st.error("Incorrect username or password.")
-        st.stop()
-    elif st.session_state.get("authentication_status") is None:
+    if not st.session_state.get("authenticated"):
+        st.subheader("Login")
+        _username = st.text_input("Username")
+        _password = st.text_input("Password", type="password")
+        if st.button("Login"):
+            _usernames = _cfg.get("credentials", {}).get("usernames", {})
+            _user = _usernames.get(_username)
+            if _user and bcrypt.checkpw(_password.encode(), _user["password"].encode()):
+                st.session_state["authenticated"] = True
+                st.rerun()
+            else:
+                st.error("Incorrect username or password.")
         st.stop()
 # ─────────────────────────────────────────────────────────────────────────────
 
