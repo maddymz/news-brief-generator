@@ -23,11 +23,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Write .htpasswd from secret
-        # HTPASSWD_CONTENT is a GitHub secret containing the raw .htpasswd contents.
-        # nginx/.htpasswd is gitignored, so we recreate it here before docker build.
-        run: echo "${{ secrets.HTPASSWD_CONTENT }}" > nginx/.htpasswd
-
       - name: Set up flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
 
@@ -50,6 +45,7 @@ jobs:
             OPENWEATHERMAP_API_KEY="${{ secrets.OPENWEATHERMAP_API_KEY }}" \
             EXCHANGE_RATE_API_KEY="${{ secrets.EXCHANGE_RATE_API_KEY }}" \
             PEXELS_API_KEY="${{ secrets.PEXELS_API_KEY }}" \
+            APP_CREDENTIALS="${{ secrets.APP_CREDENTIALS }}" \
             --app ${{ env.FLY_APP }} \
             --stage
           flyctl deploy \

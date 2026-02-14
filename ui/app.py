@@ -5,6 +5,29 @@ st.set_page_config(page_title="News Brief Generator", page_icon="📰", layout="
 from agents import run_scout, run_publisher, normalize_payload
 from utils import get_location_context
 from components import inject_css, page_header, tile
+import os
+import json
+
+# ── Auth ─────────────────────────────────────────────────────────────────────
+# APP_CREDENTIALS env var (Fly secret) holds a JSON blob with hashed credentials.
+# If absent (local dev without docker-compose), auth is skipped entirely.
+_creds_json = os.getenv("APP_CREDENTIALS")
+if _creds_json:
+    import streamlit_authenticator as stauth
+    _cfg = json.loads(_creds_json)
+    _auth = stauth.Authenticate(
+        _cfg["credentials"],
+        _cfg["cookie"]["name"],
+        _cfg["cookie"]["key"],
+        _cfg["cookie"]["expiry_days"],
+    )
+    _auth.login()
+    if st.session_state.get("authentication_status") is False:
+        st.error("Incorrect username or password.")
+        st.stop()
+    elif st.session_state.get("authentication_status") is None:
+        st.stop()
+# ─────────────────────────────────────────────────────────────────────────────
 
 inject_css()
 page_header()
