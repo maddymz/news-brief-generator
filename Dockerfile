@@ -23,4 +23,4 @@ RUN mkdir -p /var/log/supervisor
 EXPOSE 80
 
 # docker-compose.yml overrides CMD per-service — this is only used in Fly.io mode
-CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/news-brief.conf"]
