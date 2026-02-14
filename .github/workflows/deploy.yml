@@ -55,5 +55,5 @@ jobs:
           flyctl deploy \
             --app ${{ env.FLY_APP }} \
             --image ${{ env.IMAGE }}:${{ github.sha }} \
-            --wait-timeout 180 \
+            --wait-timeout 300 \
             --strategy rolling
