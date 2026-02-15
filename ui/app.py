@@ -38,16 +38,31 @@ if _creds_json:
 inject_css()
 page_header()
 
-st.markdown("**What do you want to search about?**")
-topic = st.text_input("topic", "Semiconductor factory opening in Japan", label_visibility="collapsed")
+st.markdown("### 🔍 Enter your topic")
+st.markdown("Get comprehensive news reports with live context, weather, and financial data")
+topic = st.text_input("topic", "Semiconductor factory opening in Japan", label_visibility="collapsed", placeholder="Enter any news topic...")
 
 # Auto-fetch city using LLM
 city = get_location_context(topic)['capital']
 
 # Metadata toggle in sidebar
 with st.sidebar:
-    st.header("Options")
-    show_metadata = st.checkbox("Show metadata", value=False)
+    st.markdown("## ⚙️ Settings")
+    st.markdown("---")
+    show_metadata = st.checkbox("🔍 Show metadata", value=False)
+    st.markdown("---")
+    st.markdown("### 💡 About")
+    st.markdown("""
+    This app uses AI agents to:
+    - 🔎 Gather news headlines
+    - 🌍 Fetch weather data
+    - 💱 Get exchange rates
+    - 🖼️ Find related images
+    - ✍️ Generate articles
+    """)
+    st.markdown("---")
+    st.markdown("**Version:** 0.1.0")
+    st.markdown("**Powered by:** FastMCP + OpenAI")
 
 if st.button("Generate Report", use_container_width=True):
     with st.spinner("Running Scout..."):
@@ -65,38 +80,44 @@ if st.button("Generate Report", use_container_width=True):
     rate = fx.get("rate", "")
     fx_str = f"1 {currency} = {rate} USD" if rate else "N/A"
 
+    st.markdown("---")
+    st.markdown("### 📊 Context Overview")
     st.write("")
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3, gap="medium")
     with col1:
         st.markdown(tile("📍", "Location", scout_data.get("location", "N/A")), unsafe_allow_html=True)
     with col2:
         st.markdown(tile("🌤", "Weather", weather_str), unsafe_allow_html=True)
     with col3:
         st.markdown(tile("💱", "Exchange Rate", fx_str), unsafe_allow_html=True)
+
+    st.write("")
     st.write("")
 
     # Render Article in an expander to reduce scrolling
-    st.subheader("Final Article")
-    with st.expander("Read full article"):
+    st.markdown("### 📄 Generated Article")
+    with st.expander("▼ Read full article", expanded=True):
         st.markdown(publisher_data.get("article", "No output"), unsafe_allow_html=True)
 
     # Display related image
+    st.write("")
     try:
         image_url = scout_data["media"]["images"][0]["src"]["url"]
         if image_url:
-            st.image(image_url, caption="Related Image", use_container_width=True)
+            st.markdown("### 🖼️ Related Imagery")
+            st.image(image_url, caption="AI-selected contextual image", use_container_width=True)
     except Exception:
         pass
 
     # Metadata section — hidden by default
     if show_metadata:
-        st.divider()
-        st.subheader("Metadata")
+        st.markdown("---")
+        st.markdown("### 🔧 Debug Information")
 
-        st.markdown("**Payload**")
-        st.json(publisher_data.get("payload"))
+        with st.expander("📦 Payload Data", expanded=False):
+            st.json(publisher_data.get("payload"))
 
         signal = publisher_data.get("signal")
         if isinstance(signal, dict) and "ERROR" not in signal:
-            st.markdown("**Signal**")
-            st.json(signal)
+            with st.expander("📡 Signal Data", expanded=False):
+                st.json(signal)
