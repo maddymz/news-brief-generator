@@ -4,9 +4,6 @@ import streamlit as st
 def inject_css():
     st.markdown("""
     <style>
-    /* ── Import Google Fonts ──────────────────────────────────────────────── */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
     /* ── Color tokens ─────────────────────────────────────────────────────── */
     :root {
         --c-bg:         #f8fafc;
@@ -20,7 +17,7 @@ def inject_css():
         --c-accent-hover: #5568d3;
         --c-shadow:     rgba(0,0,0,0.06);
         --c-shadow-lg:  rgba(0,0,0,0.12);
-        --font-main:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-main:    -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
     @media (prefers-color-scheme: dark) {
         :root {
@@ -39,8 +36,8 @@ def inject_css():
     }
 
     /* ── Global styles ────────────────────────────────────────────────────── */
-    * {
-        font-family: var(--font-main) !important;
+    body {
+        font-family: var(--font-main);
     }
 
     /* ── App background ───────────────────────────────────────────────────── */

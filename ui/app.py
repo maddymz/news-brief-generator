@@ -96,7 +96,7 @@ if st.button("Generate Report", use_container_width=True):
 
     # Render Article in an expander to reduce scrolling
     st.markdown("### 📄 Generated Article")
-    with st.expander("📖 Read full article", expanded=True):
+    with st.expander("▼ Read full article", expanded=True):
         st.markdown(publisher_data.get("article", "No output"), unsafe_allow_html=True)
 
     # Display related image
