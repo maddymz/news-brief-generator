@@ -42,9 +42,6 @@ st.markdown("### 🔍 Enter your topic")
 st.markdown("Get comprehensive news reports with live context, weather, and financial data")
 topic = st.text_input("topic", "Semiconductor factory opening in Japan", label_visibility="collapsed", placeholder="Enter any news topic...")
 
-# Auto-fetch city using LLM
-city = get_location_context(topic)['capital']
-
 # Metadata toggle in sidebar
 with st.sidebar:
     st.markdown("## ⚙️ Settings")
@@ -65,6 +62,8 @@ with st.sidebar:
     st.markdown("**Powered by:** FastMCP + OpenAI")
 
 if st.button("Generate Report", use_container_width=True):
+    with st.spinner("Detecting location..."):
+        city = get_location_context(topic)['capital']
     with st.spinner("Running Scout..."):
         scout_data = run_scout(topic, city)
     scout_data = normalize_payload(scout_data)
