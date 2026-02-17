@@ -61,7 +61,7 @@ with st.sidebar:
     st.markdown("**Version:** 0.1.0")
     st.markdown("**Powered by:** FastMCP + OpenAI")
 
-if st.button("Generate Report", use_container_width=True):
+if st.button("Generate Report", width="stretch"):
     with st.spinner("Detecting location..."):
         city = get_location_context(topic)['capital']
     with st.spinner("Running Scout..."):
@@ -104,7 +104,7 @@ if st.button("Generate Report", use_container_width=True):
         image_url = scout_data["media"]["images"][0]["src"]["url"]
         if image_url:
             st.markdown("### 🖼️ Related Imagery")
-            st.image(image_url, caption="AI-selected contextual image", use_container_width=True)
+            st.image(image_url, caption="AI-selected contextual image", width="stretch")
     except Exception:
         pass
 
