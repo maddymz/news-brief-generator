@@ -20,12 +20,19 @@ python agents/scout_agent/main.py              # Port 8004
 python agents/publisher_agent/main.py          # Port 8005
 ```
 
-**3. Start UI**:
+**3. Start UI backend**:
 ```bash
-streamlit run ui/app.py
+python ui/backend/main.py             # Port 8006
 ```
 
-No build step, linting config, or test suite exists in this project.
+**4. Start UI frontend** (first run: `cd ui/frontend && npm install`):
+```bash
+cd ui/frontend && npm run dev         # Port 5173 — proxies /api → 8006
+```
+
+Open `http://localhost:5173` in your browser.
+
+No build step (for Python), linting config, or test suite exists in this project.
 
 ## Architecture
 
@@ -52,7 +59,8 @@ ui/app.py
 - **MCP servers** (`mcp-servers/`) expose tools via `@mcp.tool` decorators and run as independent HTTP services. Each wraps one or more external APIs.
 - **Agents** (`agents/`) are also FastMCP servers that expose higher-level tools. They orchestrate MCP servers using `AsyncExitStack` + `stdio_client` for concurrent calls.
 - **Post office** (`protocol/post_office.py`) is a simple JSON append-log used for async handoffs between agents. Agents poll it with `wait_for_response(task_id)`. It is cleared at the start of each Scout run.
-- **UI** (`ui/app.py`) calls agents sequentially via MCP clients. It uses `gpt-4o-mini` (OpenAI) to extract location from the user's topic before calling Scout.
+- **UI backend** (`ui/backend/main.py`) is a FastAPI app (port 8006) that exposes `POST /api/generate` as an SSE stream. It calls agents via MCP and streams progress events to the browser as each pipeline step completes.
+- **UI frontend** (`ui/frontend/`) is a Vite + React SPA (port 5173 in dev). It consumes the SSE stream and renders results progressively. Vite proxies `/api/*` to port 8006.
 
 ### Environment Variables
 
@@ -63,4 +71,4 @@ All API keys are loaded from `.env`. Required keys:
 - `EXCHANGE_RATE_API_KEY` — FX rates
 - `PEXELS_API_KEY` — stock images
 
-No dependency manifest exists; install FastMCP, Streamlit, python-dotenv, httpx, and openai manually.
+No dependency manifest exists; install FastMCP, FastAPI, uvicorn, python-dotenv, httpx, and openai manually.

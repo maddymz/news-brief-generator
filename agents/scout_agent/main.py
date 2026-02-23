@@ -1,7 +1,6 @@
 import asyncio
 import json
 import os
-import time
 from fastmcp import FastMCP, Client
 from contextlib import AsyncExitStack
 from protocol.post_office import send_message, read_messages, clear_messages
@@ -14,17 +13,18 @@ CONTEXTUALIST_URL = os.getenv("CONTEXTUALIST_URL", "http://0.0.0.0:8000/mcp")
 MEDIA_URL = os.getenv("MEDIA_ENGINE_URL", "http://0.0.0.0:8003/mcp")
 
 
-def wait_for_response(task_id: str, timeout: int = 10):
+async def wait_for_response(task_id: str, timeout: int = 10):
     """
     Poll the post office for a response matching the given task ID.
+    Uses asyncio.sleep so the event loop stays responsive during the wait.
     """
-    start = time.time()
-    while time.time() - start < timeout:
+    start = asyncio.get_event_loop().time()
+    while asyncio.get_event_loop().time() - start < timeout:
         messages = read_messages()
         for msg in messages:
             if msg.get("task_id") == task_id and msg.get("recipient") == "scout":
                 return msg
-        time.sleep(0.5)
+        await asyncio.sleep(0.5)
     return None
 
 
@@ -59,7 +59,7 @@ async def scout(topic: str, city: str, task_id: str = "task-1"):
         )
 
         # Wait for the contextualist response via the post office
-        response = wait_for_response(task_id)
+        response = await wait_for_response(task_id)
         context = response["payload"]
 
         # Fetch related media assets
