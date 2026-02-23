@@ -2,6 +2,7 @@ import os
 import requests
 from fastmcp import FastMCP
 from dotenv import load_dotenv
+from tavily import TavilyClient
 
 load_dotenv()
 
@@ -9,44 +10,30 @@ mcp = FastMCP("World Data server")
 
 @mcp.tool
 def search_news(query: str):
-    newsApiKey = os.getenv("NEWSAPI_KEY")
-    if not newsApiKey:
-        error =  {
-            "error": "key not present"
-        }
-        return error
-    
-    params = {
-        "q": query,
-        "language": "en",
-        "sortBy": "publishedAt",
-        "pageSize": 1,
-        "apiKey": newsApiKey
-    }
+    api_key = os.getenv("TAVILY_API_KEY")
+    if not api_key:
+        return {"error": "TAVILY_API_KEY not set"}
 
-    NEWS_API_URL = "https://newsapi.org/v2/everything"
+    client = TavilyClient(api_key=api_key)
+    response = client.search(
+        query=query,
+        topic="news",
+        search_depth="advanced",
+        max_results=1,
+    )
+    results = response.get("results", [])
+    if not results:
+        return {"query": query, "headline": None}
 
-    response = requests.get(NEWS_API_URL, params=params, timeout=10)
-    if response.status_code != 200:
-        return {
-            "error": "NewsAPI request failed",
-            "status_code": response.status_code,
-            "details": response.text
-        }
-    data = response.json()
-    articles = data.get("articles", [])
-
-    if not articles:
-        return {"query": query, "articles": []}
-
-    article = articles[0]
+    r = results[0]
+    print(f"results of tavily search: {r}")
     return {
-        "query": query,
-        "headline": article.get("title"),
-        "description": article.get("description"),
-        "source": article.get("source", {}).get("name"),
-        "url": article.get("url"),
-        "published_at": article.get("publishedAt")
+        "query":        query,
+        "headline":     r.get("title"),
+        "description":  r.get("content"),
+        "source":       r.get("url"),
+        "url":          r.get("url"),
+        "published_at": r.get("published_date"),
     }
    
 OPENWEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather"
