@@ -1,20 +1,20 @@
 export default function ContextTiles({ location, weather, fx }) {
   return (
     <div className="context-section">
-      <h3 className="section-title">📊 Context Overview</h3>
+      <h3 className="section-title">Context Overview</h3>
       <div className="tiles-row">
-        <Tile icon="📍" label="Location" value={location} />
-        <Tile icon="🌤" label="Weather" value={weather} />
-        <Tile icon="💱" label="Exchange Rate" value={fx} />
+        <Tile type="location" icon="📍" label="Location"      value={location} />
+        <Tile type="weather"  icon="🌤" label="Weather"       value={weather} />
+        <Tile type="fx"       icon="💱" label="Exchange Rate" value={fx} />
       </div>
     </div>
   )
 }
 
-function Tile({ icon, label, value }) {
+function Tile({ type, icon, label, value }) {
   return (
-    <div className="nbg-tile">
-      <div className="nbg-tile-icon">{icon}</div>
+    <div className="nbg-tile" data-type={type}>
+      <span className="nbg-tile-icon">{icon}</span>
       <div className="nbg-tile-label">{label}</div>
       <div className="nbg-tile-value">{value}</div>
     </div>
