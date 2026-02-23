@@ -34,7 +34,7 @@ app.add_middleware(
 # to call directly from here without triggering FastMCP's nested-client bug.
 WORLD_DATA_URL = os.getenv("WORLD_DATA_URL", "http://0.0.0.0:8001/mcp")
 FINANCE_URL    = os.getenv("FINANCE_URL",    "http://0.0.0.0:8002/mcp")
-MEDIA_URL      = os.getenv("MEDIA_URL",      "http://0.0.0.0:8003/mcp")
+MEDIA_URL      = os.getenv("MEDIA_ENGINE_URL", "http://0.0.0.0:8003/mcp")
 PUBLISHER_URL  = os.getenv("PUBLISHER_URL",  "http://0.0.0.0:8005/mcp")
 
 
