@@ -10,7 +10,6 @@ primary_region = "iad"
   FINANCE_URL       = "http://127.0.0.1:8002/mcp"
   CONTEXTUALIST_URL = "http://127.0.0.1:8000/mcp"
   MEDIA_ENGINE_URL  = "http://127.0.0.1:8003/mcp"
-  MEDIA_URL         = "http://127.0.0.1:8003/mcp"
   SCOUT_URL         = "http://127.0.0.1:8004/mcp"
   PUBLISHER_URL     = "http://127.0.0.1:8005/mcp"
   # post_office.json lives on the Fly Volume, not inside the source tree
