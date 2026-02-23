@@ -1,7 +1,23 @@
+# Python
 .venv/
 __pycache__/
 *.egg-info/
+*.pyc
+
+# Environment
 .env
+
+# Runtime state
 protocol/post_office.json
+
+# Frontend
+ui/frontend/node_modules/
+ui/frontend/dist/
+ui/frontend/.vite/
+
+# Secrets / infra
 nginx/.htpasswd
+
+# Misc
 docs/
+.DS_Store
