@@ -10,6 +10,8 @@ dependencies = [
     "fastmcp",
     "fastapi",
     "uvicorn",
+    "aiofiles",
+    "tavily-python",
     "streamlit",
     "bcrypt",
     "openai",

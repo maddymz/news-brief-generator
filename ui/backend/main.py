@@ -100,6 +100,14 @@ async def generate(req: GenerateRequest):
     )
 
 
+# Serve React SPA when the built dist/ exists (Docker / after npm run build).
+# Must be mounted AFTER all API routes so /api/* is handled first.
+_dist = ROOT / "ui" / "frontend" / "dist"
+if _dist.exists():
+    from fastapi.staticfiles import StaticFiles
+    app.mount("/", StaticFiles(directory=str(_dist), html=True), name="static")
+
+
 if __name__ == "__main__":
     import uvicorn
 

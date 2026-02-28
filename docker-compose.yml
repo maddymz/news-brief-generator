@@ -60,20 +60,24 @@ services:
     env_file: .env
     restart: unless-stopped
 
-  # ── UI (layer 3) ──────────────────────────────────────────────────────────
+  # ── UI backend (layer 3) ──────────────────────────────────────────────────
 
-  ui:
+  ui-backend:
     build: .
-    command: streamlit run ui/app.py --server.port 8501 --server.address 0.0.0.0
+    command: python ui/backend/main.py
     volumes:
       - post-office:/app/protocol
     depends_on:
-      - scout
+      - world-data
+      - finance-monitor
+      - media-engine
       - publisher
     env_file: .env
     environment:
-      SCOUT_URL: http://scout:8004/mcp
-      PUBLISHER_URL: http://publisher:8005/mcp
+      WORLD_DATA_URL:    http://world-data:8001/mcp
+      FINANCE_URL:       http://finance-monitor:8002/mcp
+      MEDIA_ENGINE_URL:  http://media-engine:8003/mcp
+      PUBLISHER_URL:     http://publisher:8005/mcp
     restart: unless-stopped
 
   # ── Nginx (public entry point) ────────────────────────────────────────────
@@ -84,9 +88,8 @@ services:
       - "80:80"
     volumes:
       - ./nginx/nginx.compose.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/.htpasswd:/etc/nginx/.htpasswd:ro
     depends_on:
-      - ui
+      - ui-backend
     restart: unless-stopped
 
 volumes:

@@ -66,7 +66,7 @@ ui/app.py
 
 All API keys are loaded from `.env`. Required keys:
 - `OPENAI_API_KEY` — article generation and location extraction
-- `NEWSAPI_KEY` — news headlines
+- `TAVILY_API_KEY` — real-time news headlines (replaces NewsAPI)
 - `OPENWEATHERMAP_API_KEY` — weather
 - `EXCHANGE_RATE_API_KEY` — FX rates
 - `PEXELS_API_KEY` — stock images
